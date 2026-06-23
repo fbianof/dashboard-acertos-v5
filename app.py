@@ -105,24 +105,20 @@ div[data-baseweb="select"] {
    MULTISELECT - ITENS SELECIONADOS
 ================================================== */
 
-/* Cor dos chips selecionados */
 [data-baseweb="tag"] {
     background-color: #0D6EFD !important;
     border-radius: 6px !important;
 }
 
-/* Texto do chip */
 [data-baseweb="tag"] span {
     color: white !important;
     font-weight: 500;
 }
 
-/* Ícone X */
 [data-baseweb="tag"] svg {
     color: white !important;
 }
 
-/* Hover do X */
 [data-baseweb="tag"] svg:hover {
     opacity: 0.8;
 }
@@ -142,6 +138,82 @@ div[data-baseweb="select"] {
 
 [data-testid="stSidebar"] ::-webkit-scrollbar-track {
     background: transparent;
+}
+
+/* ==================================================
+   KPIs EXECUTIVOS (st.metric)
+================================================== */
+
+[data-testid="stMetric"] {
+    padding: 18px;
+    border-radius: 16px;
+
+    border-left: 6px solid #0D6EFD;
+
+    background: rgba(255,255,255,0.03);
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.08),
+        0 8px 24px rgba(0,0,0,0.08);
+
+    transition: all 0.25s ease;
+
+    min-height: 125px;
+}
+
+[data-testid="stMetric"]:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 6px 14px rgba(0,0,0,0.12),
+        0 12px 30px rgba(0,0,0,0.15);
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+}
+
+/* ==================================================
+   MODO ESCURO
+================================================== */
+
+[data-theme="dark"] [data-testid="stMetric"] {
+    background: rgba(255,255,255,0.02);
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.35),
+        0 12px 28px rgba(0,0,0,0.25);
+}
+
+/* ==================================================
+   TABELAS
+================================================== */
+
+[data-testid="stDataFrame"] {
+    border-radius: 12px;
+}
+
+/* ==================================================
+   GRÁFICOS
+================================================== */
+
+.js-plotly-plot {
+    border-radius: 12px;
+}
+
+/* ==================================================
+   SUBHEADERS
+================================================== */
+
+h2, h3 {
+    margin-top: 0.3rem !important;
+    margin-bottom: 0.8rem !important;
 }
 
 </style>
