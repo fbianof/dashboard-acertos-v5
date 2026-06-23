@@ -165,7 +165,7 @@ def mostrar_escolas(df, df_ideb):
 
         fig.update_traces(
             texttemplate="%{x:.2f}",
-            textposition="outside",
+            textposition="auto",
             textfont_size=18
         )
 
@@ -176,6 +176,10 @@ def mostrar_escolas(df, df_ideb):
             ),
             bargap=0.10,
             coloraxis_showscale=False
+        )
+
+        fig.update_yaxes(
+            categoryorder="total ascending"
         )
 
     # ==================================================
@@ -195,7 +199,7 @@ def mostrar_escolas(df, df_ideb):
 
         fig.update_traces(
             texttemplate="%{y:.2f}",
-            textposition="outside",
+            textposition="auto",
             textfont_size=16
         )
 
@@ -297,11 +301,12 @@ def mostrar_escolas(df, df_ideb):
             ranking_df,
             names="Escola",
             values="Média",
-            color_discrete_sequence=px.colors.qualitative.Bold
+            color_discrete_sequence=cores
         )
 
         fig.update_traces(
-            textinfo="percent+label"
+            textinfo="percent+label",
+            textposition="auto"
         )
 
         fig.update_layout(
@@ -319,11 +324,12 @@ def mostrar_escolas(df, df_ideb):
             names="Escola",
             values="Média",
             hole=0.45,
-            color_discrete_sequence=px.colors.qualitative.Bold
+            color_discrete_sequence=cores
         )
 
         fig.update_traces(
-            textinfo="percent+label"
+            textinfo="percent+label",
+            textposition="auto"
         )
 
         fig.update_layout(
@@ -342,78 +348,17 @@ def mostrar_escolas(df, df_ideb):
     st.divider()
 
     # ==================================================
-    # RANKING GERAL
+    # EXIBIÇÃO
     # ==================================================
 
-    st.subheader("🏅 Escolas x Qtde Turmas")
-
-    ranking_df = (
-        df.groupby("Escola")
-        .agg(
-            Qtde_Turmas=("Turma", "nunique"),
-            Qtde_Alunos=("Aluno", "count"),
-            Acertos=("Acertos", "sum"),
-            Média=("Acertos", "mean")
-        )
-        .reset_index()
-    )
-
-    ranking_df = ranking_df.sort_values(
-        "Média",
-        ascending=False
-    )
-
-    ranking_df.insert(
-        0,
-        "Posição",
-        range(
-            1,
-            len(ranking_df) + 1
-        )
-    )
-
-    ranking_df["Acertos"] = (
-        ranking_df["Acertos"]
-        .round(0)
-        .astype(int)
-    )
-
-    ranking_df["Média"] = (
-        ranking_df["Média"]
-        .round(2)
-    )
-
-    # Ordenação das colunas
-
-    ranking_df = ranking_df[
-        [
-            "Posição",
-            "Escola",
-            "Qtde_Turmas",
-            "Qtde_Alunos",
-            "Acertos",
-            "Média"
-        ]
-    ]
-
-    # Renomeia apenas para exibição
-
-    ranking_df.columns = [
-        "Posição",
-        "Escola",
-        "Qtde Turmas",
-        "Qtde Alunos",
-        "Acertos",
-        "Média"
-    ]
+    st.caption(f"Total de escolas: {len(ranking_df)}")
 
     st.dataframe(
         ranking_df,
         use_container_width=True,
         hide_index=True,
-        height=450
+        height=min(35 * len(ranking_df) + 40, 2000)
     )
-
     st.divider()
 
     # ==================================================
@@ -592,109 +537,7 @@ def mostrar_escolas(df, df_ideb):
 
     st.divider()
 
-    # ==================================================
-    # INSIGHTS IA
-    # ==================================================
 
-    st.subheader(
-        "🤖 Insights IA"
-    )
 
-    c1, c2 = st.columns(2)
 
-    with c1:
 
-        st.success(
-            "Pontos Positivos"
-        )
-
-        st.markdown(f"""
-✅ Melhor escola da rede: **{melhor_escola}**
-
-✅ Média geral da rede: **{media_rede:.2f}**
-
-✅ {perc_acima_media:.1f}% das escolas acima da média
-
-✅ IDEB médio da rede: **{media_ideb}**
-
-✅ Indicadores consolidados
-""")
-
-    with c2:
-
-        st.error(
-            "Pontos de Atenção"
-        )
-
-        st.markdown(f"""
-⚠️ Escola crítica: **{pior_escola}**
-
-⚠️ Diferença de desempenho entre escolas
-
-⚠️ Escolas abaixo da média precisam de atenção
-
-⚠️ Necessidade de intervenção pedagógica
-
-⚠️ Monitoramento contínuo recomendado
-""")
-
-    st.divider()
-
-    # ==================================================
-    # RELATÓRIO IA
-    # ==================================================
-
-    st.subheader(
-        "📄 Relatório IA"
-    )
-
-    if st.button(
-        "🤖 Gerar Relatório das Escolas"
-    ):
-
-        relatorio = f"""
-A rede possui {total_escolas} escolas avaliadas.
-
-A média geral da rede é {media_rede:.2f}.
-
-A melhor escola da rede é {melhor_escola}
-com média {nota_melhor:.2f}.
-
-A escola que requer maior atenção é
-{pior_escola} com média {nota_pior:.2f}.
-
-O IDEB médio da rede é {media_ideb}.
-
-{perc_acima_media:.1f}% das escolas
-estão acima da média da rede.
-"""
-
-        st.text_area(
-            "Relatório Gerado",
-            relatorio,
-            height=250
-        )
-
-    st.divider()
-
-    # ==================================================
-    # EXPORTAÇÃO
-    # ==================================================
-
-    st.subheader(
-        "📥 Exportação"
-    )
-
-    buffer = BytesIO()
-
-    ranking_df.to_excel(
-        buffer,
-        index=False
-    )
-
-    st.download_button(
-        "📥 Exportar Ranking Geral",
-        data=buffer.getvalue(),
-        file_name="ranking_escolas.xlsx",
-        key="download_ranking_escolas_v22"
-    )

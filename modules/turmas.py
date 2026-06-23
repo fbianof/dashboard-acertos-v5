@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from io import BytesIO
+
 
 def mostrar_turmas(df):
     # ==================================================
@@ -352,195 +352,6 @@ def mostrar_turmas(df):
 
     st.divider()
 
-    # ==================================================
-    # RANKING GERAL DAS TURMAS
-    # ==================================================
-
-    st.divider()
-
-    st.subheader("🏅 Ranking Geral das Turmas")
-
-    # Limpeza dos dados
-
-    base_ranking = df_filtrado.copy()
-
-    base_ranking["Turma"] = (
-        base_ranking["Turma"]
-        .astype(str)
-        .str.strip()
-    )
-
-    base_ranking = base_ranking[
-        base_ranking["Turma"].notna()
-    ]
-
-    base_ranking = base_ranking[
-        base_ranking["Turma"] != ""
-        ]
-
-    base_ranking = base_ranking[
-        base_ranking["Turma"] != "nan"
-        ]
-
-    # Agrupamento
-
-    ranking_grid = (
-        base_ranking
-        .groupby(
-            [
-                "Escola",
-                "Turma"
-            ]
-        )
-        .agg(
-            Qtde_Alunos=("Aluno", "count"),
-            Acertos=("Acertos", "sum"),
-            Média=("Acertos", "mean")
-        )
-        .reset_index()
-    )
-
-    # Ordenação alfabética
-
-    ranking_grid = ranking_grid.sort_values(
-        [
-            "Escola",
-            "Turma"
-        ]
-    )
-
-    # Posição
-
-    ranking_grid.insert(
-        0,
-        "Posição",
-        range(
-            1,
-            len(ranking_grid) + 1
-        )
-    )
-
-    # Formatação
-
-    ranking_grid["Acertos"] = (
-        ranking_grid["Acertos"]
-        .round(0)
-        .astype(int)
-    )
-
-    ranking_grid["Média"] = (
-        ranking_grid["Média"]
-        .round(2)
-    )
-
-    # Ordem das colunas
-
-    ranking_grid = ranking_grid[
-        [
-            "Posição",
-            "Escola",
-            "Turma",
-            "Qtde_Alunos",
-            "Acertos",
-            "Média"
-        ]
-    ]
-
-    # Renomeia para exibição
-
-    ranking_grid.columns = [
-        "Posição",
-        "Escola",
-        "Turma",
-        "Qtde Alunos",
-        "Acertos",
-        "Média"
-    ]
-
-    # Exibição
-
-    st.dataframe(
-        ranking_grid,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    st.divider()
-
-    # ==================================================
-    # TOP 10 E PIORES 10 TURMAS
-    # ==================================================
-
-    st.subheader("📊 Desempenho das Turmas")
-
-    ranking_top = (
-        df_filtrado
-        .groupby("Turma")["Acertos"]
-        .mean()
-        .sort_values(ascending=False)
-    )
-
-    top10 = (
-        ranking_top
-        .head(10)
-        .reset_index(name="Média")
-    )
-
-    bottom10 = (
-        ranking_top
-        .tail(10)
-        .reset_index(name="Média")
-    )
-
-    # ==================================================
-    # PALETA
-    # ==================================================
-
-    paleta_top_turmas = st.selectbox(
-        "🎨 Paleta dos gráficos",
-        [
-            "Colorido",
-            "Escala Azul",
-            "Escala Verde",
-            "Escala Vermelha",
-            "Escala Laranja"
-        ],
-        key="paleta_top_bottom_turmas"
-    )
-
-    if paleta_top_turmas == "Colorido":
-
-        cores_top = px.colors.qualitative.Bold
-
-    elif paleta_top_turmas == "Escala Azul":
-
-        cores_top = px.colors.sequential.Blues
-
-    elif paleta_top_turmas == "Escala Verde":
-
-        cores_top = px.colors.sequential.Greens
-
-    elif paleta_top_turmas == "Escala Vermelha":
-
-        cores_top = px.colors.sequential.Reds
-
-    else:
-
-        cores_top = px.colors.sequential.Oranges
-
-    # ==================================================
-    # RÓTULOS
-    # ==================================================
-
-    top10["Rotulo"] = top10["Média"].apply(
-        lambda x: f"{x:.2f}"
-    )
-
-    bottom10["Rotulo"] = bottom10["Média"].apply(
-        lambda x: f"{x:.2f}"
-    )
-
-    st.divider()
 
     # ==================================================
     # RANKING ANALÍTICO DAS TURMAS
@@ -578,7 +389,12 @@ def mostrar_turmas(df):
 
     ranking_analitico = (
         base_analitica
-        .groupby("Turma")
+        .groupby(
+            [
+                "Escola",
+                "Turma"
+            ]
+        )
         .agg(
             Qtde_Alunos=("Aluno", "count"),
             Acertos=("Acertos", "sum"),
@@ -645,6 +461,7 @@ def mostrar_turmas(df):
     ranking_analitico = ranking_analitico[
         [
             "Posição",
+            "Escola",
             "Turma",
             "Qtde_Alunos",
             "Acertos",
@@ -655,6 +472,7 @@ def mostrar_turmas(df):
 
     ranking_analitico.columns = [
         "Posição",
+        "Escola",
         "Turma",
         "Qtde Alunos",
         "Acertos",
@@ -662,19 +480,21 @@ def mostrar_turmas(df):
         "Classificação"
     ]
 
-
-
     # ==================================================
     # TABELA
     # ==================================================
+
+    st.caption(
+        f"Total de turmas analisadas: {len(ranking_analitico)}"
+    )
 
     st.dataframe(
         ranking_analitico,
         use_container_width=True,
         hide_index=True,
         height=min(
-            600,
-            (len(ranking_analitico) * 35) + 40
+            (len(ranking_analitico) * 35) + 40,
+            2000
         )
     )
 
@@ -710,20 +530,6 @@ def mostrar_turmas(df):
     # CLASSIFICAÇÃO
     # ==================================================
 
-    def classificar_turma(media):
-
-        if media >= 16:
-            return "🟢 Excelente"
-
-        elif media >= 13:
-            return "🔵 Bom"
-
-        elif media >= 10:
-            return "🟠 Atenção"
-
-        else:
-            return "🔴 Crítico"
-
     dist_turmas = (
         df_filtrado
         .groupby("Turma")["Acertos"]
@@ -733,8 +539,9 @@ def mostrar_turmas(df):
 
     dist_turmas["Categoria"] = (
         dist_turmas["Média"]
-        .apply(classificar_turma)
+        .apply(classificar)
     )
+
 
     # ==================================================
     # AGRUPAMENTO
@@ -883,246 +690,146 @@ def mostrar_turmas(df):
         use_container_width=True
     )
 
-    # ==================================================
-    # INSIGHTS IA DAS TURMAS
-    # ==================================================
 
-    st.subheader("🤖 Insights IA das Turmas")
+    st.divider()
 
     # ==================================================
-    # CÁLCULOS
+    # TURMAS DESTAQUE E TURMAS EM ATENÇÃO
     # ==================================================
 
-    media_escola = (
-        ranking_analitico["Média"]
+    st.subheader(
+        "🏆 Turmas Destaque e ⚠️ Turmas que Requerem Atenção"
+    )
+
+    qtde_top = st.selectbox(
+        "Quantidade de turmas",
+        [5, 10, 15, 20],
+        index=1,
+        key="qtde_top_turmas"
+    )
+
+    ranking_turmas_top = (
+        df_filtrado
+        .groupby("Turma")["Acertos"]
         .mean()
+        .sort_values(ascending=False)
+        .reset_index(name="Média")
     )
 
-    melhor_turma = (
-        ranking_analitico
-        .iloc[0]["Turma"]
-    )
-
-    melhor_media = (
-        ranking_analitico
-        .iloc[0]["Média"]
-    )
-
-    pior_turma = (
-        ranking_analitico
-        .iloc[-1]["Turma"]
-    )
-
-    pior_media = (
-        ranking_analitico
-        .iloc[-1]["Média"]
-    )
-
-    diferenca = (
-            melhor_media
-            - pior_media
-    )
-
-    qtde_excelente = (
-        ranking_analitico["Classificação"]
-        .str.contains("Excelente")
-        .sum()
-    )
-
-    qtde_bom = (
-        ranking_analitico["Classificação"]
-        .str.contains("Bom")
-        .sum()
-    )
-
-    qtde_atencao = (
-        ranking_analitico["Classificação"]
-        .str.contains("Atenção")
-        .sum()
-    )
-
-    qtde_critico = (
-        ranking_analitico["Classificação"]
-        .str.contains("Crítico")
-        .sum()
-    )
-
-    perc_acima_meta = (
-            (
-                    ranking_analitico["Média"] >= 13
-            ).mean() * 100
+    ranking_turmas_top["Média"] = (
+        ranking_turmas_top["Média"]
+        .round(2)
     )
 
     # ==================================================
-    # LAYOUT
+    # TOP TURMAS
     # ==================================================
+
+    top_turmas = (
+        ranking_turmas_top
+        .head(qtde_top)
+        .sort_values(
+            "Média",
+            ascending=False
+        )
+        .copy()
+    )
+
+    # ==================================================
+    # TURMAS EM ATENÇÃO
+    # ==================================================
+
+    bottom_turmas = (
+        ranking_turmas_top
+        .tail(qtde_top)
+        .sort_values(
+            "Média",
+            ascending=True
+        )
+        .copy()
+    )
 
     col1, col2 = st.columns(2)
 
     # ==================================================
-    # POSITIVOS
+    # MELHORES TURMAS
     # ==================================================
 
     with col1:
 
         st.success(
-            "Pontos Positivos"
+            f"🏆 Top {qtde_top} Turmas"
         )
 
-        st.markdown(f"""
-    ✅ Melhor turma da escola: **{melhor_turma}**
+        fig_top = px.bar(
+            top_turmas,
+            x="Média",
+            y="Turma",
+            orientation="h",
+            text="Média",
+            color="Média",
+            color_continuous_scale="Greens"
+        )
 
-    ✅ Média da melhor turma: **{melhor_media:.2f}**
+        fig_top.update_traces(
+            texttemplate="%{x:.2f}",
+            textposition="outside",
+            cliponaxis=False
+        )
 
-    ✅ Média geral das turmas: **{media_escola:.2f}**
+        fig_top.update_yaxes(
+            categoryorder="array",
+            categoryarray=top_turmas["Turma"][::-1]
+        )
 
-    ✅ Turmas classificadas como Excelente: **{qtde_excelente}**
+        fig_top.update_layout(
+            height=500,
+            coloraxis_showscale=False
+        )
 
-    ✅ Turmas classificadas como Bom: **{qtde_bom}**
-
-    ✅ {perc_acima_meta:.1f}% das turmas estão acima da meta pedagógica
-
-    ✅ Estrutura de desempenho consolidada para acompanhamento
-
-    ✅ Indicadores disponíveis para tomada de decisão
-
-    ✅ Comparação entre turmas realizada automaticamente
-
-    ✅ Monitoramento contínuo do desempenho escolar
-    """)
+        st.plotly_chart(
+            fig_top,
+            use_container_width=True
+        )
 
     # ==================================================
-    # ATENÇÃO
+    # TURMAS EM ATENÇÃO
     # ==================================================
 
     with col2:
 
         st.error(
-            "Pontos de Atenção"
+            f"⚠️ {qtde_top} Turmas que Requerem Atenção"
         )
 
-        st.markdown(f"""
-    ⚠️ Turma que requer maior atenção: **{pior_turma}**
-
-    ⚠️ Média da turma crítica: **{pior_media:.2f}**
-
-    ⚠️ Diferença entre melhor e pior turma: **{diferenca:.2f}**
-
-    ⚠️ Turmas em Atenção: **{qtde_atencao}**
-
-    ⚠️ Turmas em situação Crítica: **{qtde_critico}**
-
-    ⚠️ Possível desigualdade de desempenho entre turmas
-
-    ⚠️ Necessidade de acompanhamento pedagógico focalizado
-
-    ⚠️ Recomendado monitoramento das turmas abaixo da meta
-
-    ⚠️ Avaliar estratégias de recuperação da aprendizagem
-
-    ⚠️ Priorizar intervenções nas turmas classificadas como Críticas
-    """)
-
-    st.divider()
-
-    # ==================================================
-    # RELATÓRIO EXECUTIVO DAS TURMAS
-    # ==================================================
-
-    st.subheader("📄 Relatório Executivo das Turmas")
-
-    if st.button(
-            "🤖 Gerar Relatório das Turmas",
-            key="relatorio_turmas"
-    ):
-        relatorio = f"""
-    A escola {escola_selecionada} possui {total_turmas} turmas avaliadas.
-
-    A média geral das turmas foi de {media_escola:.2f} acertos.
-
-    A turma com melhor desempenho foi {melhor_turma},
-    atingindo média de {melhor_media:.2f} acertos.
-
-    A turma que requer maior atenção é {pior_turma},
-    com média de {pior_media:.2f} acertos.
-
-    A diferença entre a melhor e a pior turma foi de
-    {diferenca:.2f} pontos.
-
-    Foram identificadas:
-
-    • {qtde_excelente} turmas classificadas como Excelente;
-
-    • {qtde_bom} turmas classificadas como Bom;
-
-    • {qtde_atencao} turmas classificadas como Atenção;
-
-    • {qtde_critico} turmas classificadas como Crítico.
-
-    O percentual de turmas acima da meta pedagógica foi de
-    {perc_acima_meta:.1f}%.
-
-    Recomenda-se manter o acompanhamento das turmas com melhor desempenho e priorizar ações pedagógicas para as turmas classificadas como Atenção e Crítico, visando reduzir desigualdades internas e elevar os indicadores de aprendizagem.
-    """
-
-        st.text_area(
-            "Relatório Gerado",
-            relatorio,
-            height=350
+        fig_bottom = px.bar(
+            bottom_turmas,
+            x="Média",
+            y="Turma",
+            orientation="h",
+            text="Média",
+            color="Média",
+            color_continuous_scale="Reds"
         )
 
-    st.divider()
-
-    # ==================================================
-    # EXPORTAÇÃO
-    # ==================================================
-
-    st.subheader("📥 Exportação")
-
-    st.caption(
-        "Exporta os principais indicadores das turmas da escola selecionada."
-    )
-
-    buffer = BytesIO()
-
-    with pd.ExcelWriter(
-            buffer,
-            engine="openpyxl"
-    ) as writer:
-
-        # Ranking Analítico
-
-        ranking_analitico.to_excel(
-            writer,
-            sheet_name="Ranking Analitico",
-            index=False
+        fig_bottom.update_traces(
+            texttemplate="%{x:.2f}",
+            textposition="outside",
+            cliponaxis=False
         )
 
-        # Ranking Visual
-
-        ranking_analitico.to_excel(
-            writer,
-            sheet_name="Ranking Visual",
-            index=False
+        fig_bottom.update_yaxes(
+            categoryorder="array",
+            categoryarray=bottom_turmas["Turma"][::-1]
         )
 
-        # Distribuição
-
-        dist_graf.to_excel(
-            writer,
-            sheet_name="Distribuicao",
-            index=False
+        fig_bottom.update_layout(
+            height=500,
+            coloraxis_showscale=False
         )
 
-    st.download_button(
-        label="📥 Exportar Relatório Completo",
-        data=buffer.getvalue(),
-        file_name=(
-            f"turmas_"
-            f"{escola_selecionada}.xlsx"
-        ),
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="download_relatorio_turmas"
-    )
-
+        st.plotly_chart(
+            fig_bottom,
+            use_container_width=True
+        )
     st.divider()

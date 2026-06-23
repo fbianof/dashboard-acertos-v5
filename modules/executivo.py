@@ -4,18 +4,13 @@ import plotly.express as px
 from io import BytesIO
 
 def mostrar_executivo(df, df_ideb):
-
-
     # ==================================================
     # VALIDAÇÕES
     # ==================================================
-
     if df is None or len(df) == 0:
         st.warning("Nenhum dado encontrado.")
         return
-
     st.header("📈 EXECUTIVO")
-
     # ==================================================
     # INDICADORES
     # ==================================================
@@ -112,6 +107,7 @@ def mostrar_executivo(df, df_ideb):
         ranking_escolas
         .head(10)
         .reset_index()
+        .sort_values("Acertos")
     )
 
     bottom10 = (
@@ -183,22 +179,22 @@ def mostrar_executivo(df, df_ideb):
             y="Escola",
             orientation="h",
             color="Acertos",
-            color_continuous_scale=cores
+            color_continuous_scale=cores,
+            text="Rotulo"
         )
 
-        fig_top.add_scatter(
-            x=top10["Acertos"] + 0.15,
-            y=top10["Escola"],
-            mode="text",
-            text=[
-                f"{v:.2f}"
-                for v in top10["Acertos"]
-            ],
+        fig_top.update_traces(
+            textposition="auto",
             textfont=dict(
                 size=14,
-                color="black"
-            ),
-            showlegend=False
+            )
+        )
+
+        fig_top.update_xaxes(
+            range=[
+                0,
+                top10["Acertos"].max() * 1.15
+            ]
         )
 
         fig_top.update_layout(
@@ -233,22 +229,22 @@ def mostrar_executivo(df, df_ideb):
             y="Escola",
             orientation="h",
             color="Acertos",
-            color_continuous_scale=cores
+            color_continuous_scale=cores,
+            text="Rotulo"
         )
 
-        fig_bottom.add_scatter(
-            x=bottom10["Acertos"] + 0.15,
-            y=bottom10["Escola"],
-            mode="text",
-            text=[
-                f"{v:.2f}"
-                for v in bottom10["Acertos"]
-            ],
+        fig_bottom.update_traces(
+            textposition="auto",
             textfont=dict(
                 size=14,
-                color="black"
-            ),
-            showlegend=False
+            )
+        )
+
+        fig_bottom.update_xaxes(
+            range=[
+                0,
+                bottom10["Acertos"].max() * 1.15
+            ]
         )
 
         fig_bottom.update_layout(
@@ -268,6 +264,8 @@ def mostrar_executivo(df, df_ideb):
             fig_bottom,
             use_container_width=True
         )
+
+
     st.divider()
 
     # ==================================================
@@ -333,120 +331,18 @@ def mostrar_executivo(df, df_ideb):
         "Média"
     ]
 
+    altura = min(
+        3000,
+        (len(ranking_df) + 1) * 35
+    )
+
     st.dataframe(
         ranking_df,
         use_container_width=True,
         hide_index=True,
-        height=450
-    )
-    st.divider()
-
-    # ==================================================
-    # INSIGHTS IA
-    # ==================================================
-
-    st.subheader("🤖 Insights IA")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        st.success("Pontos Positivos")
-
-        st.markdown(f"""
-    ```
-    
-    ✅ Melhor escola da rede: **{melhor_escola}**
-    
-    ✅ {perc_meta:.1f}% dos alunos atingiram a meta
-    
-    ✅ Rede possui **{total_escolas} escolas analisadas**
-    
-    ✅ Média geral de **{media_geral:.2f} Média**
-    
-    ✅ Ranking consolidado para tomada de decisão
-    """)
-
-
-    with col2:
-
-        diferenca = (
-            ranking_escolas.max()
-            - ranking_escolas.min()
-        )
-
-        st.error("Pontos de Atenção")
-
-        st.markdown(f"""
-    ```
-    
-    ⚠️ Escola crítica: **{pior_escola}**
-    
-    ⚠️ {100 - perc_meta:.1f}% dos alunos não atingiram a meta
-    
-    ⚠️ Diferença entre melhor e pior escola: **{diferenca:.2f}**
-    
-    ⚠️ Necessidade de acompanhamento pedagógico
-    
-    ⚠️ Possível desigualdade de desempenho
-    """)
-
-
-    st.divider()
-
-    # ==================================================
-    # RELATÓRIO EXECUTIVO
-    # ==================================================
-
-    st.subheader("📄 Relatório Executivo")
-
-    if st.button(
-        "🤖 Gerar Relatório Executivo",
-        key="relatorio_executivo"
-    ):
-
-        relatorio = f"""
-    ```
-    
-    A rede analisada possui {total_escolas} escolas,
-    {total_turmas} turmas e {total_alunos} alunos.
-    
-    A média geral foi de {media_geral:.2f} Média.
-    
-    A escola destaque da rede foi {melhor_escola}.
-    
-    A unidade que requer maior atenção é {pior_escola}.
-    
-    O percentual de alunos que atingiram a meta foi de
-    {perc_meta:.1f}%.
-    """
-
-
-        st.text_area(
-            "Relatório Gerado",
-            relatorio,
-            height=250
-        )
-
-    st.divider()
-
-    # ==================================================
-    # EXPORTAÇÃO
-    # ==================================================
-
-    st.subheader("📥 Exportações")
-
-    buffer = BytesIO()
-
-    ranking_df.to_excel(
-        buffer,
-        index=False
+        height=altura
     )
 
-    st.download_button(
-        label="📥 Exportar Ranking Geral",
-        data=buffer.getvalue(),
-        file_name="ranking_escolas.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+st.divider()
 
+st.divider()
