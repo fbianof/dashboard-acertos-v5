@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from streamlit_option_menu import option_menu
 
 from modules.executivo import mostrar_executivo
 from modules.escolas import mostrar_escolas
@@ -14,188 +15,269 @@ from modules.ideb import mostrar_ideb
 # ==================================================
 
 st.set_page_config(
-    page_title="Dashboard Semecel V7",
+    page_title="Dashboard Semecel Rondonópolis",
     page_icon="📊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ==================================================
-
-# ESTILO GLOBAL
-
+# CSS
 # ==================================================
 
 st.markdown("""
-
 <style>
 
-/* CARDS KPI */
-[data-testid="stMetric"]{
-    background: #F8FAFC;
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid #E5E7EB;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+/* ==================================================
+   LAYOUT GERAL
+================================================== */
+
+.block-container {
+    padding-top: 1.3rem;
+    padding-bottom: 1rem;
 }
 
-/* TÍTULO KPI */
-[data-testid="stMetricLabel"]{
-    color:#374151;
-    font-size:1rem;
-    font-weight:600;
+/* ==================================================
+   SIDEBAR
+================================================== */
+
+section[data-testid="stSidebar"] {
+    width: 320px !important;
 }
 
-/* VALOR KPI */
-[data-testid="stMetricValue"]{
-    color:#111827;
-    font-size:2.4rem;
-    font-weight:800;
+[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(128,128,128,0.15);
 }
 
-/* HOVER */
-[data-testid="stMetric"]:hover{
-    transform: translateY(-2px);
-    transition: 0.2s;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+[data-testid="stSidebarContent"] {
+    padding-top: 1rem;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+}
+
+/* ==================================================
+   TÍTULO SIDEBAR
+================================================== */
+
+.sidebar-title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* ==================================================
+   DIVISÓRIAS
+================================================== */
+
+hr {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+/* ==================================================
+   OPTION MENU
+================================================== */
+
+.nav-link {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    border-radius: 8px;
+}
+
+.nav-link.active {
+    border-radius: 8px;
+}
+
+/* ==================================================
+   FILTROS
+================================================== */
+
+div[data-baseweb="select"] {
+    font-size: 0.95rem;
+}
+
+/* ==================================================
+   MULTISELECT - ITENS SELECIONADOS
+================================================== */
+
+/* Cor dos chips selecionados */
+[data-baseweb="tag"] {
+    background-color: #0D6EFD !important;
+    border-radius: 6px !important;
+}
+
+/* Texto do chip */
+[data-baseweb="tag"] span {
+    color: white !important;
+    font-weight: 500;
+}
+
+/* Ícone X */
+[data-baseweb="tag"] svg {
+    color: white !important;
+}
+
+/* Hover do X */
+[data-baseweb="tag"] svg:hover {
+    opacity: 0.8;
+}
+
+/* ==================================================
+   SCROLLBAR SIDEBAR
+================================================== */
+
+[data-testid="stSidebar"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
+    background: rgba(128,128,128,0.4);
+    border-radius: 10px;
+}
+
+[data-testid="stSidebar"] ::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 </style>
-
 """, unsafe_allow_html=True)
-
-
-# ==================================================
-# CABEÇALHO
-# ==================================================
-
-st.title("📊 Dashboard Semecel V7")
-st.caption("Sistema de Gestão Educacional, Avaliações e IDEB")
-
 # ==================================================
 # CARREGAMENTO DOS DADOS
 # ==================================================
 
 try:
     df = pd.read_excel("data/Acertos_V7.xlsx")
-except:
+except Exception:
     st.error("Arquivo data/Acertos_V7.xlsx não encontrado.")
     st.stop()
 
 try:
     df_ideb = pd.read_excel("data/ideb.xlsx")
-except:
+except Exception:
     df_ideb = None
 
 # ==================================================
 # SIDEBAR
 # ==================================================
 
-st.sidebar.header("⚙️ Configurações")
+with st.sidebar:
 
-cor_tema = st.sidebar.color_picker(
-    "Cor padrão dos gráficos",
-    "#1f77b4"
-)
+    st.markdown(
+        '<div class="sidebar-title">📊 DASHBOARD SEMECEL RONDONÓPOLIS</div>',
+        unsafe_allow_html=True
+    )
+
+    menu = option_menu(
+        menu_title=None,
+        options=[
+            "EXECUTIVO",
+            "ESCOLAS",
+            "TURMAS",
+            "ALUNOS",
+            "NOTAS",
+            "METAS",
+            "IDEB"
+        ],
+        icons=[
+            "bar-chart",
+            "building",
+            "people",
+            "person",
+            "journal-text",
+            "bullseye",
+            "graph-up"
+        ],
+        default_index=0,
+        styles={
+            "container": {
+                "padding": "0!important"
+            },
+            "icon": {
+                "color": "#0D6EFD",
+                "font-size": "18px"
+            },
+            "nav-link": {
+                "font-size": "15px",
+                "text-align": "left",
+                "margin": "4px",
+                "padding": "10px",
+                "--hover-color": "rgba(13,110,253,0.15)"
+            },
+            "nav-link-selected": {
+                "background-color": "#0D6EFD",
+                "color": "white"
+            }
+        }
+    )
+
+    st.divider()
+
+    st.markdown("### ⚙️ Filtros")
+
+    escolas = sorted(df["Escola"].dropna().unique())
+
+    escolas_selecionadas = st.multiselect(
+        "Filtro Executivo / Escolas",
+        escolas,
+        default=escolas
+    )
 
 # ==================================================
-# FILTROS GLOBAIS
+# FILTRO GLOBAL
 # ==================================================
-
-escolas = sorted(df["Escola"].dropna().unique())
-
-escolas_selecionadas = st.sidebar.multiselect(
-    "🏫 Escolas",
-    escolas,
-    default=escolas
-)
 
 df_filtrado = df[
     df["Escola"].isin(escolas_selecionadas)
 ]
 
 # ==================================================
-# ABAS
+# CONTEÚDO
 # ==================================================
 
-(
-    tab_exec,
-    tab_escolas,
-    tab_turmas,
-    tab_alunos,
-    tab_notas,
-    tab_metas,
-    tab_ideb
-) = st.tabs([
-    "📈 EXECUTIVO",
-    "🏫 ESCOLAS",
-    "👨‍🏫 TURMAS",
-    "👨‍🎓 ALUNOS",
-    "📝 NOTAS",
-    "🎯 METAS",
-    "📚 IDEB"
-])
+if menu == "EXECUTIVO":
 
-# ==================================================
-# EXECUTIVO
-# ==================================================
-
-with tab_exec:
     mostrar_executivo(
         df_filtrado,
         df_ideb
     )
 
-# ==================================================
-# ESCOLAS
-# ==================================================
+elif menu == "ESCOLAS":
 
-with tab_escolas:
     mostrar_escolas(
         df_filtrado,
         df_ideb
     )
 
-# ==================================================
-# TURMAS
-# ==================================================
+elif menu == "TURMAS":
 
-with tab_turmas:
     mostrar_turmas(
         df_filtrado
     )
 
-# ==================================================
-# ALUNOS
-# ==================================================
+elif menu == "ALUNOS":
 
-with tab_alunos:
     mostrar_alunos(
         df_filtrado
     )
 
-# ==================================================
-# NOTAS
-# ==================================================
+elif menu == "NOTAS":
 
-with tab_notas:
     mostrar_notas(
         df_filtrado
     )
 
-# ==================================================
-# METAS
-# ==================================================
+elif menu == "METAS":
 
-with tab_metas:
     mostrar_metas(
         df_filtrado
     )
 
-# ==================================================
-# IDEB
-# ==================================================
-
-with tab_ideb:
+elif menu == "IDEB":
 
     if df_ideb is None:
         st.warning("Planilha IDEB não encontrada.")
