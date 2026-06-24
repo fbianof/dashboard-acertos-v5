@@ -55,34 +55,40 @@ def mostrar_escolas(df, df_ideb):
 
     c1.metric(
         "🏫 Total de Escolas",
-        total_escolas
+        total_escolas,
+        help="Quantidade total de escolas consideradas nos filtros aplicados."
     )
 
     c2.metric(
         "📊 Média da Rede",
-        f"{media_rede:.2f}"
+        f"{media_rede:.2f}",
+        help="Média de acertos das escolas selecionadas."
     )
 
     c3.metric(
         "🏆 Nota da Melhor Escola",
-        f"{nota_melhor:.2f}"
+        f"{nota_melhor:.2f}",
+        help="Maior média de acertos entre as escolas selecionadas."
     )
 
     c4, c5, c6 = st.columns(3)
 
     c4.metric(
         "⚠️ Nota da Escola Crítica",
-        f"{nota_pior:.2f}"
+        f"{nota_pior:.2f}",
+        help="Menor média de acertos entre as escolas selecionadas."
     )
 
     c5.metric(
         "📚 Média IDEB",
-        media_ideb
+        media_ideb,
+        help="Média do IDEB das escolas selecionadas."
     )
 
     c6.metric(
         "🎯 % Acima da Média",
-        f"{perc_acima_media:.1f}%"
+        f"{perc_acima_media:.1f}%",
+        help="Percentual de escolas com média superior à média geral da rede."
     )
 
     st.info(

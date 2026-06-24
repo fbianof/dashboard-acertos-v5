@@ -109,22 +109,26 @@ def mostrar_alunos(df):
 
     c1.metric(
         "👨‍🎓 Alunos",
-        total_alunos
+        total_alunos,
+        help="Quantidade total de alunos considerados nos filtros aplicados."
     )
 
     c2.metric(
         "📊 Média Geral",
-        f"{media_geral:.2f}"
+        f"{media_geral:.2f}",
+        help="Média de acertos dos alunos na avaliação."
     )
 
     c3.metric(
         "🏆 Melhor Nota",
-        melhor_aluno["Acertos"]
+        melhor_aluno["Acertos"],
+        help="Maior quantidade de acertos obtida por um aluno na avaliação."
     )
 
     c4.metric(
         "🎯 % Meta",
-        f"{perc_meta:.1f}%"
+        f"{perc_meta:.1f}%",
+        help="Percentual de alunos que atingiram ou superaram a meta definida para a avaliação."
     )
 
     if escola_selecionada == "TODAS":

@@ -3,6 +3,9 @@ import pandas as pd
 import plotly.express as px
 from io import BytesIO
 
+from streamlit import caption
+
+
 def mostrar_executivo(df, df_ideb):
     # ==================================================
     # VALIDAÇÕES
@@ -10,7 +13,7 @@ def mostrar_executivo(df, df_ideb):
     if df is None or len(df) == 0:
         st.warning("Nenhum dado encontrado.")
         return
-    st.header("📈 EXECUTIVO")
+    st.header("📈 VISÃO GERAL")
     # ==================================================
     # INDICADORES
     # ==================================================
@@ -21,9 +24,8 @@ def mostrar_executivo(df, df_ideb):
 
     media_geral = df["Acertos"].mean()
 
-    perc_meta = (
-        (df["Acertos"] >= 13).sum()
-        / len(df)
+    perc_aproveitamento = (
+        df["Acertos"].mean() / 18
     ) * 100
 
     ranking_escolas = (
@@ -50,18 +52,21 @@ def mostrar_executivo(df, df_ideb):
     c1, c2, c3 = st.columns(3)
 
     c1.metric(
-        "🏫 Escolas",
-        total_escolas
+        label="🏫 Escolas",
+        value=total_escolas,
+        help="Quantidade total de escolas filtradas."
     )
 
     c2.metric(
-        "👨‍🏫 Turmas",
-        total_turmas
+        label="👨‍🏫 Turmas",
+        value=total_turmas,
+        help="Quantidade total de turmas filtradas para avaliação."
     )
 
     c3.metric(
-        "👨‍🎓 Alunos",
-        f"{total_alunos:,}".replace(",", ".")
+        label="🎓 Alunos",
+        value=f"{total_alunos:,}".replace(",", "."),
+        help="Quantidade total de alunos participantes."
     )
 
     # ==================================================
@@ -71,20 +76,21 @@ def mostrar_executivo(df, df_ideb):
     c4, c5, c6 = st.columns(3)
 
     c4.metric(
-        "📊 Média Geral",
-        f"{media_geral:.2f}"
+        label="📊 Média Geral",
+        value=f"{media_geral:.2f}",
+        help="Média de acertos considerando todos os alunos."
     )
 
     c5.metric(
-        "🎯 % Meta",
-        f"{perc_meta:.1f}%"
+        label="🎯 Aproveitamento Geral",
+        value=f"{perc_aproveitamento:.1f}%",
+        help="Percentual médio de acertos. Fórmula: (Média de Acertos ÷ 18 questões) × 100."
     )
 
     c6.metric(
-        "📚 Média IDEB",
-        "-"
-        if media_ideb is None
-        else f"{media_ideb:.2f}"
+        label="📚 Média IDEB",
+        value=f"{media_ideb:.2f}",
+        help="Média do IDEB das escolas selecionadas."
     )
 
     st.info(
@@ -298,12 +304,7 @@ def mostrar_executivo(df, df_ideb):
         )
     )
 
-    ranking_df["Média"] = (
-        ranking_df["Média"]
-        .round(0)
-        .astype(int)
-    )
-
+    
     ranking_df["Média"] = (
         ranking_df["Média"]
         .round(2)

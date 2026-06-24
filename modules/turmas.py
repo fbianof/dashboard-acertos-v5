@@ -132,39 +132,44 @@ def mostrar_turmas(df):
         ).mean() * 100
     )
 
-
     c1, c2, c3 = st.columns(3)
 
     c1.metric(
         "👨‍🏫 Total de Turmas",
-        total_turmas
+        total_turmas,
+        help="Quantidade total de turmas consideradas nos filtros aplicados."
     )
 
     c2.metric(
         "🎓 Total de Alunos",
-        total_alunos
+        total_alunos,
+        help="Quantidade total de alunos pertencentes às turmas selecionadas."
     )
 
     c3.metric(
         "📊 Média Geral",
-        f"{media_geral:.2f}"
+        f"{media_geral:.2f}",
+        help="Média de acertos dos alunos das turmas selecionadas."
     )
 
     c4, c5, c6 = st.columns(3)
 
     c4.metric(
         "🏆 Nota da Melhor Turma",
-        f"{nota_melhor:.2f}"
+        f"{nota_melhor:.2f}",
+        help="Maior média de acertos obtida entre as turmas selecionadas."
     )
 
     c5.metric(
         "⚠️ Nota da Turma Crítica",
-        f"{nota_pior:.2f}"
+        f"{nota_pior:.2f}",
+        help="Menor média de acertos obtida entre as turmas selecionadas."
     )
 
     c6.metric(
         "🎯 % Acima da Média",
-        f"{perc_acima_media:.1f}%"
+        f"{perc_acima_media:.1f}%",
+        help="Percentual de turmas com média superior à média geral das turmas selecionadas."
     )
 
     st.info(
