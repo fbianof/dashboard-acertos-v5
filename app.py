@@ -21,10 +21,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================================================
-# CSS
-# ==================================================
-
 st.markdown("""
 <style>
 
@@ -33,7 +29,7 @@ st.markdown("""
 ================================================== */
 
 .block-container {
-    padding-top: 1.3rem;
+    padding-top: 0.9rem;
     padding-bottom: 1rem;
 }
 
@@ -49,10 +45,26 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid rgba(128,128,128,0.15);
 }
 
+/* Remove espaço superior da sidebar */
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 0rem !important;
+    margin-top: -10px !important;
+}
+
+[data-testid="stSidebarHeader"] {
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+    min-height: 0 !important;
+}
+
 [data-testid="stSidebarContent"] {
-    padding-top: 1rem;
+    padding-top: 0rem !important;
     padding-left: 0.8rem;
     padding-right: 0.8rem;
+}
+
+section[data-testid="stSidebar"] .block-container {
+    padding-top: 0rem !important;
 }
 
 /* ==================================================
@@ -91,6 +103,26 @@ hr {
 
 .nav-link.active {
     border-radius: 8px;
+}
+
+/* CORREÇÃO DOS ÍCONES */
+
+.nav-link i {
+    color: #0D6EFD !important;
+}
+
+.nav-link svg {
+    color: #0D6EFD !important;
+    fill: #0D6EFD !important;
+}
+
+.nav-link.active,
+.nav-link.active span,
+.nav-link.active i,
+.nav-link.active svg,
+.nav-link.active path {
+    color: white !important;
+    fill: white !important;
 }
 
 /* ==================================================
@@ -169,15 +201,24 @@ div[data-baseweb="select"] {
         0 12px 30px rgba(0,0,0,0.15);
 }
 
-[data-testid="stMetricLabel"] {
-    font-size: 0.95rem !important;
+/* ==================================================
+   TÍTULO DOS KPIs
+================================================== */
+
+[data-testid="stMetric"] > [data-testid="stMarkdownContainer"] p {
+    font-size: 1.15rem !important;
     font-weight: 600 !important;
 }
 
-[data-testid="stMetricValue"] {
-    font-size: 2rem !important;
+/* ==================================================
+   VALORES DOS KPIs
+================================================== */
+
+[data-testid="stMetricValue"] p {
+    font-size: 2.0rem !important;
     font-weight: 700 !important;
 }
+
 
 /* ==================================================
    MODO ESCURO
@@ -218,6 +259,8 @@ h2, h3 {
 
 </style>
 """, unsafe_allow_html=True)
+
+
 # ==================================================
 # CARREGAMENTO DOS DADOS
 # ==================================================
@@ -238,16 +281,14 @@ except Exception:
 # ==================================================
 
 with st.sidebar:
-
     st.markdown(
         '<div class="sidebar-title">📊 DASHBOARD SEMECEL RONDONÓPOLIS</div>',
         unsafe_allow_html=True
     )
-
     menu = option_menu(
         menu_title=None,
         options=[
-            "EXECUTIVO",
+            "VISÃO GERAL",
             "ESCOLAS",
             "TURMAS",
             "ALUNOS",
@@ -287,7 +328,6 @@ with st.sidebar:
         }
     )
 
-    st.divider()
 
     st.markdown("### ⚙️ Filtros")
 
@@ -311,7 +351,7 @@ df_filtrado = df[
 # CONTEÚDO
 # ==================================================
 
-if menu == "EXECUTIVO":
+if menu == "VISÃO GERAL":
 
     mostrar_executivo(
         df_filtrado,
