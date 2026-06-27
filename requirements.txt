@@ -3,4 +3,7 @@ pandas
 plotly
 openpyxl
 python-docx
-streamlit-option-menu
+
+
+folium>=0.20.0
+streamlit-folium>=0.25.0
