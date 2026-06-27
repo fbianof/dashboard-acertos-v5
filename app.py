@@ -9,6 +9,7 @@ from modules.alunos import mostrar_alunos
 from modules.notas import mostrar_notas
 from modules.metas import mostrar_metas
 from modules.ideb import mostrar_ideb
+from modules.geobusiness import mostrar_geobusiness
 
 # ==================================================
 # CONFIGURAÇÃO
@@ -293,7 +294,7 @@ with st.sidebar:
             "TURMAS",
             "ALUNOS",
             "NOTAS",
-            "METAS",
+            "GEOBUSINESS",
             "IDEB"
         ],
         icons=[
@@ -349,7 +350,7 @@ df_filtrado = df[
 
 # ==================================================
 # CONTEÚDO
-# ==================================================
+# ==============ch====================================
 
 if menu == "VISÃO GERAL":
 
@@ -384,16 +385,9 @@ elif menu == "NOTAS":
     )
 
 elif menu == "METAS":
-
     mostrar_metas(
         df_filtrado
     )
 
-elif menu == "IDEB":
-
-    if df_ideb is None:
-        st.warning("Planilha IDEB não encontrada.")
-    else:
-        mostrar_ideb(
-            df_ideb
-        )
+elif menu == "GEOBUSINESS":
+    mostrar_geobusiness()
